@@ -14,18 +14,29 @@ module.exports = createCoreController('api::pub.pub', ({ strapi }) => ({
 
 
     async findAffordable(ctx) {
-            const { maxPrice = 1, sort = 'asc' } = ctx.query;
     try {
-        const result = await strapi.service('api::pub.pub').getAffordablePubs({
-            maxPrice: Number(maxPrice),
-            sortOrder: sort
-        });
-            ctx.body = result;
-        } catch (err) {
-            ctx.status = 500;
-            ctx.body = { error: 'Internal Server Error', details: err.message };
+
+
+        const maxPrice = ctx.query.maxPrice ? parseFloat(ctx.query.maxPrice) : 1
+        const sortOrder = ctx.query.sort ? ctx.query.sort : 'asc'
+
+        const pubs = await strapi.service('api::pub.pub').getAffordablePubs({
+            maxPrice: maxPrice,
+
+            sortOrder: sortOrder
+        })
+
+        ctx.body = pubs
+        
+    } catch (e) {
+        ctx.status = 500
+        ctx.body = {
+            error: "Internal Server Error",
+            message: e.message
         }
-    },
+    }
+}
+
 }
 )
 );
